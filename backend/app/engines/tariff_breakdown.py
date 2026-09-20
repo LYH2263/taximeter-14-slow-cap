@@ -1,4 +1,4 @@
-def calc_fare(distance_km: float, slow_min: float, night: bool, tariff: dict) -> dict:
+def calc_fare(distance_km: float, slow_min: float, night: bool, tariff: dict, slow_fee_cap: float | None = None) -> dict:
     base = float(tariff["start_price"])
     include = float(tariff["start_include_km"])
     per_km = float(tariff["per_km"])
@@ -7,7 +7,14 @@ def calc_fare(distance_km: float, slow_min: float, night: bool, tariff: dict) ->
     dist = max(0.0, float(distance_km) - include)
     mile = dist * per_km
     slow = float(slow_min) * per_slow
-    sub = base + mile + slow
+    # 低速费先乘（夜间）系数，再与上限取小
+    slow_before_cap = round(slow * night_f, 2)
+    cap = float(slow_fee_cap) if slow_fee_cap is not None else None
+    truncated = bool(cap is not None and slow_before_cap > cap)
+    slow_fee = round(min(slow_before_cap, cap), 2) if cap is not None else slow_before_cap
+    sub = base + mile
+    # 应付按截断后的低速费计算
+    total = round(sub * night_f + slow_fee, 2)
     return {
         "distance_km": round(float(distance_km), 2),
         "slow_min": round(float(slow_min), 1),
@@ -15,6 +22,9 @@ def calc_fare(distance_km: float, slow_min: float, night: bool, tariff: dict) ->
         "night_factor": night_f,
         "start": round(base * night_f, 2),
         "mileage": round(mile * night_f, 2),
-        "slow_fee": round(slow * night_f, 2),
-        "total": round(sub * night_f, 2),
+        "slow_fee": slow_fee,
+        "slow_fee_before_cap": slow_before_cap,
+        "slow_fee_truncated": truncated,
+        "slow_fee_cap": cap,
+        "total": total,
     }

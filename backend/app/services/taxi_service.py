@@ -1,3 +1,6 @@
+import json
+import math
+
 from app.db import connect
 from app.engines.night_compare import compare_day_night
 from app.engines.tariff_breakdown import calc_fare
@@ -11,16 +14,33 @@ class TaxiService:
     def list_trips(self): return trips.list_all(self._c)
     def trip(self, tid): return trips.get(self._c, tid)
     def tariff(self): return tariff.get_active(self._c)
-    def settings(self): return settings.get_map(self._c)
+    def settings(self):
+        m = settings.get_map(self._c)
+        m.setdefault("slow_fee_cap", repr(settings.get_slow_fee_cap(self._c)))
+        return m
+    def update_slow_fee_cap(self, value):
+        v = float(value)
+        if not math.isfinite(v) or v <= 0:
+            raise ValueError("slow_fee_cap must be a positive number")
+        settings.set_slow_fee_cap(self._c, v)
+        return v
     def history(self, limit=50): return runs.list_recent(self._c, limit)
+    def run_detail(self, run_id):
+        row = runs.get(self._c, run_id)
+        if not row: return None
+        row["input"] = json.loads(row.pop("input_json"))
+        row["result"] = json.loads(row.pop("result_json"))
+        return row
     def fare(self, distance_km, slow_min, night, trip_id, persist):
         t = tariff.get_active(self._c)
-        r = calc_fare(distance_km, slow_min, night, t)
+        cap = settings.get_slow_fee_cap(self._c)
+        r = calc_fare(distance_km, slow_min, night, t, cap)
         rid = runs.insert(self._c, "fare", {"distance_km": distance_km, "slow_min": slow_min, "night": night}, r, trip_id) if persist else None
         return {"run_id": rid, **r}
     def compare(self, distance_km, slow_min, persist):
         t = tariff.get_active(self._c)
-        r = compare_day_night(distance_km, slow_min, t)
+        cap = settings.get_slow_fee_cap(self._c)
+        r = compare_day_night(distance_km, slow_min, t, cap)
         rid = runs.insert(self._c, "compare", {"distance_km": distance_km, "slow_min": slow_min}, r, None) if persist else None
         return {"run_id": rid, **r}
     def dashboard(self):

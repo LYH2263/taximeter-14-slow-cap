@@ -1,6 +1,7 @@
 import json
 from app.db import connect
 from app.engines.tariff_breakdown import calc_fare
+from app.repositories.settings import DEFAULT_SLOW_FEE_CAP
 
 TARIFF = {"start_price": 11, "start_include_km": 3, "per_km": 2.5, "per_slow_min": 0.8, "night_factor": 1.2}
 
@@ -17,8 +18,9 @@ def init_db():
         conn.execute("INSERT INTO trips(label,distance_km,slow_min,night) VALUES ('白天短途',5.0,2,0)")
         conn.execute("INSERT INTO trips(label,distance_km,slow_min,night) VALUES ('夜间长途(种子)',18.0,12,1)")
         conn.execute("INSERT INTO settings(key,value) VALUES ('currency','CNY')")
-        r = calc_fare(5, 2, False, TARIFF)
+        r = calc_fare(5, 2, False, TARIFF, DEFAULT_SLOW_FEE_CAP)
         conn.execute("INSERT INTO calc_runs(kind,trip_id,input_json,result_json,created_at) VALUES ('fare',1,?,?,datetime('now'))",
             (json.dumps({"distance_km":5,"slow_min":2,"night":False}), json.dumps(r)))
-        conn.commit()
+    conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES ('slow_fee_cap',?)", (repr(DEFAULT_SLOW_FEE_CAP),))
+    conn.commit()
     conn.close()

@@ -9,6 +9,9 @@ const run = async () => { c.value = await postJSON('/api/compare', { distance_km
 <template>
   <div class="page"><h1>昼夜对比</h1>
     <button @click="run">对比</button>
-    <div v-if="c" class="panel">白天 ¥{{ c.day_total }} · 夜间 ¥{{ c.night_total }} · 差 ¥{{ c.delta }}</div>
+    <div v-if="c" class="panel">
+      <p>白天 ¥{{ c.day_total }}（低速截断：{{ c.day_slow_fee_truncated ? '是' : '否' }}） · 夜间 ¥{{ c.night_total }}（低速截断：{{ c.night_slow_fee_truncated ? '是' : '否' }}） · 差 ¥{{ c.delta }}</p>
+      <p>夜间低速费先乘系数 {{ c.night.night_factor }} 再封顶：截断前 ¥{{ c.night.slow_fee_before_cap }} → 截断后 ¥{{ c.night.slow_fee }}（上限 ¥{{ c.slow_fee_cap }}）</p>
+    </div>
   </div>
 </template>

@@ -10,5 +10,9 @@ def insert(conn, kind, payload, result, trip_id=None):
     conn.commit()
     return int(cur.lastrowid)
 
+def get(conn, run_id):
+    row = conn.execute("SELECT * FROM calc_runs WHERE id=?", (run_id,)).fetchone()
+    return dict(row) if row else None
+
 def list_recent(conn, limit=50):
     return [dict(r) for r in conn.execute("SELECT * FROM calc_runs ORDER BY id DESC LIMIT ?", (limit,)).fetchall()]
