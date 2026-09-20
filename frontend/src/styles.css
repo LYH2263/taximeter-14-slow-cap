@@ -1,4 +1,4 @@
-:root { --bg:#1a1208; --panel:#2a2010; --accent:#ffc233; --text:#fff8e7; --muted:#b8a070; }
+:root { --bg:#1a1208; --panel:#2a2010; --accent:#ffc233; --text:#fff8e7; --muted:#b8a070; --ok:#7bd88f; --err:#ff7a6b; }
 body { margin:0; font-family: Georgia, serif; background: var(--bg); color: var(--text); }
 .taxi-layout { display:grid; grid-template-columns: 220px 1fr; min-height:100vh; }
 .meter-dial { background:#0d0a04; padding:1rem; border-right:4px double var(--accent); }
@@ -14,3 +14,11 @@ th,td { border-bottom:1px solid #443820; padding:0.35rem; }
 .hero-num { font-size:2rem; color:var(--accent); font-weight:700; }
 input { background:#120e06; border:1px solid var(--muted); color:var(--text); padding:0.3rem; }
 a { color: var(--accent); }
+.badge { display:inline-block; font-size:0.78rem; padding:0.15rem 0.55rem; border-radius:999px; border:1px solid var(--accent); color:var(--accent); margin-left:0.4rem; white-space:nowrap; }
+.badge-capped { background:var(--accent); color:#1a1208; font-weight:700; }
+.form-msg { font-size:0.85rem; margin:0.4rem 0 0; min-height:1em; }
+.form-msg.ok { color:var(--ok); }
+.form-msg.err { color:var(--err); }
+.hint { color:var(--muted); font-size:0.82rem; margin:0.25rem 0; }
+.fee-row { margin:0.35rem 0; }
+.detail-block { margin-bottom:0.75rem; }

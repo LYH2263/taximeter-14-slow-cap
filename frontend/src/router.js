@@ -6,6 +6,7 @@ import FareMeter from './pages/FareMeter.vue'
 import TariffRules from './pages/TariffRules.vue'
 import NightCompare from './pages/NightCompare.vue'
 import RunHistory from './pages/RunHistory.vue'
+import RunDetail from './pages/RunDetail.vue'
 import Settings from './pages/Settings.vue'
 
 export default createRouter({
@@ -18,6 +19,7 @@ export default createRouter({
     { path: '/tariff', component: TariffRules },
     { path: '/night', component: NightCompare },
     { path: '/history', component: RunHistory },
+    { path: '/history/:id', component: RunDetail },
     { path: '/settings', component: Settings },
   ],
 })

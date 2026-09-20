@@ -7,6 +7,6 @@ def list_trips():
 @router.get("/trips/{trip_id}")
 def get_trip(trip_id: int):
     with TaxiService() as s:
-        row = s.trip(trip_id)
+        row = s.trip_with_fare(trip_id)
         if not row: raise HTTPException(404)
         return row
